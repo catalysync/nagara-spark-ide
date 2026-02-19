@@ -1,0 +1,212 @@
+/* Nagara Code Workbooks - Custom IDE Styles */
+
+:root {
+  --nagara-font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Menlo, monospace;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* Dark theme overrides for Polaris */
+[data-polaris-color-scheme="dark"] {
+  --p-color-bg: #0d1117;
+  --p-color-bg-surface: #161b22;
+  --p-color-bg-surface-secondary: #1c2128;
+  --p-color-bg-surface-hover: #21262d;
+  --p-color-bg-surface-active: #282e36;
+  --p-color-border: #30363d;
+}
+
+/* Scrollbar styles */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #374151 transparent;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #374151;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #4b5563;
+}
+
+/* React Flow overrides */
+.react-flow {
+  background: var(--p-color-bg, #0d1117) !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.react-flow__panel {
+  pointer-events: all !important;
+  z-index: 5 !important;
+}
+
+.react-flow__node {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.react-flow__edge-path {
+  stroke: #58a6ff !important;
+  stroke-width: 2;
+}
+
+.react-flow__connection-line {
+  stroke: #58a6ff !important;
+  stroke-width: 2;
+  stroke-dasharray: 5 5;
+}
+
+.react-flow__minimap {
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #30363d;
+}
+
+.react-flow__controls {
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #30363d;
+}
+
+.react-flow__controls button {
+  background: #161b22;
+  border-color: #30363d;
+  color: #c9d1d9;
+}
+
+.react-flow__controls button:hover {
+  background: #21262d;
+}
+
+/* Custom node styles */
+.nagara-node {
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 2px solid #30363d;
+  min-width: 200px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.nagara-node:hover {
+  border-color: #58a6ff;
+}
+
+.nagara-node.selected {
+  border-color: #58a6ff;
+  box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.2);
+}
+
+.nagara-node.executing {
+  border-color: #d29922;
+  animation: pulse 1.5s infinite;
+}
+
+.nagara-node.error {
+  border-color: #f85149;
+}
+
+.nagara-node.success {
+  border-color: #3fb950;
+}
+
+.nagara-node-dataset {
+  background: #0c2d6b;
+}
+
+.nagara-node-transform {
+  background: #161b22;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* Resizer handle */
+.resize-handle {
+  height: 5px;
+  background: #21262d;
+  cursor: row-resize;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+
+.resize-handle:hover {
+  background: #58a6ff;
+}
+
+.resize-handle-dot {
+  width: 32px;
+  height: 3px;
+  background: #484f58;
+  border-radius: 2px;
+}
+
+/* Polaris Frame adjustments */
+.Polaris-Frame {
+  height: 100vh;
+}
+
+.Polaris-Frame__Content {
+  height: calc(100vh - 56px);
+}
+
+/* Monaco in bottom panel */
+.node-editor-monaco .monaco-editor {
+  border-radius: 0;
+}
+
+/* Console output */
+.console-output pre {
+  font-family: var(--nagara-font-mono);
+  font-size: 12px;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* Light theme adjustments */
+[data-polaris-color-scheme="light"] .nagara-node-dataset {
+  background: #dbeafe;
+  border-color: #93c5fd;
+}
+
+[data-polaris-color-scheme="light"] .nagara-node-transform {
+  background: #ffffff;
+  border-color: #d1d5db;
+}
+
+[data-polaris-color-scheme="light"] .react-flow {
+  background: #f8fafc !important;
+}
+
+[data-polaris-color-scheme="light"] .react-flow__edge-path {
+  stroke: #3b82f6 !important;
+}
+
+[data-polaris-color-scheme="light"] .resize-handle {
+  background: #e5e7eb;
+}
+
+[data-polaris-color-scheme="light"] .resize-handle:hover {
+  background: #3b82f6;
+}
