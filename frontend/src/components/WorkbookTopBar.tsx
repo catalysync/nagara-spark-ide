@@ -2,10 +2,13 @@ import React from 'react'
 import { useTheme } from '../providers/ThemeProvider'
 import { useWorkbook } from '../providers/WorkbookProvider'
 
-export default function WorkbookTopBar() {
+interface Props {
+  onBack?: () => void
+}
+
+export default function WorkbookTopBar({ onBack }: Props) {
   const { colorScheme, toggleTheme } = useTheme()
   const { state, dispatch, saveWorkbook } = useWorkbook()
-  const isDark = colorScheme === 'dark'
 
   return (
     <div style={{
@@ -14,24 +17,43 @@ export default function WorkbookTopBar() {
       alignItems: 'center',
       padding: '0 16px',
       gap: 12,
-      background: isDark ? '#161b22' : '#ffffff',
-      borderBottom: `1px solid ${isDark ? '#30363d' : '#d0d7de'}`,
-      color: isDark ? '#c9d1d9' : '#1f2328',
+      background: 'var(--bg-surface)',
+      borderBottom: '1px solid var(--border-default)',
+      color: 'var(--text-primary)',
       flexShrink: 0,
     }}>
+      {/* Back button */}
+      {onBack && (
+        <button
+          onClick={onBack}
+          style={{
+            background: 'none',
+            border: 'none',
+            color: 'var(--text-muted)',
+            cursor: 'pointer',
+            fontSize: 16,
+            padding: '4px 8px',
+            borderRadius: 4,
+          }}
+          title="Back to project"
+        >
+          ←
+        </button>
+      )}
+
       {/* Logo */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <div style={{
-          width: 28, height: 28,
-          background: 'linear-gradient(135deg, #f97316, #dc2626)',
+          width: 24, height: 24,
+          background: 'linear-gradient(135deg, #14B8A6, #2D72D2)',
           borderRadius: 6,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          color: 'white', fontWeight: 700, fontSize: 14,
+          color: 'white', fontWeight: 700, fontSize: 11,
         }}>N</div>
         <span style={{ fontWeight: 600, fontSize: 14 }}>Nagara</span>
       </div>
 
-      <div style={{ width: 1, height: 24, background: isDark ? '#30363d' : '#d0d7de' }} />
+      <div style={{ width: 1, height: 24, background: 'var(--border-default)' }} />
 
       {/* Workbook name */}
       <input
@@ -48,25 +70,9 @@ export default function WorkbookTopBar() {
           padding: '4px 8px',
           borderRadius: 4,
         }}
-        onFocus={(e) => { e.target.style.background = isDark ? '#21262d' : '#f6f8fa' }}
+        onFocus={(e) => { e.target.style.background = 'var(--bg-surface-hover)' }}
         onBlur={(e) => { e.target.style.background = 'transparent'; saveWorkbook() }}
       />
-
-      <div style={{ width: 1, height: 24, background: isDark ? '#30363d' : '#d0d7de' }} />
-
-      {/* Branch selector (stub) */}
-      <select
-        style={{
-          background: isDark ? '#21262d' : '#f6f8fa',
-          color: 'inherit',
-          border: `1px solid ${isDark ? '#30363d' : '#d0d7de'}`,
-          borderRadius: 6,
-          padding: '4px 8px',
-          fontSize: 12,
-        }}
-      >
-        <option>main</option>
-      </select>
 
       <div style={{ flex: 1 }} />
 
@@ -74,10 +80,10 @@ export default function WorkbookTopBar() {
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12 }}>
         <div style={{
           width: 8, height: 8, borderRadius: '50%',
-          background: state.sparkReady ? '#3fb950' : '#d29922',
+          background: state.sparkReady ? 'var(--green)' : 'var(--orange)',
           animation: state.sparkReady ? 'none' : 'pulse 1.5s infinite',
         }} />
-        <span style={{ color: isDark ? '#8b949e' : '#656d76' }}>
+        <span style={{ color: 'var(--text-muted)' }}>
           {state.sparkReady ? 'Spark Ready' : 'Connecting...'}
         </span>
       </div>
@@ -86,17 +92,17 @@ export default function WorkbookTopBar() {
       <button
         onClick={toggleTheme}
         style={{
-          background: isDark ? '#21262d' : '#f6f8fa',
-          border: `1px solid ${isDark ? '#30363d' : '#d0d7de'}`,
+          background: 'var(--bg-surface-hover)',
+          border: '1px solid var(--border-default)',
           borderRadius: 6,
           padding: '4px 10px',
           cursor: 'pointer',
           color: 'inherit',
           fontSize: 14,
         }}
-        title={`Switch to ${isDark ? 'light' : 'dark'} theme`}
+        title={`Switch to ${colorScheme === 'dark' ? 'light' : 'dark'} theme`}
       >
-        {isDark ? '\u2600' : '\u263E'}
+        {colorScheme === 'dark' ? '\u2600' : '\u263E'}
       </button>
     </div>
   )

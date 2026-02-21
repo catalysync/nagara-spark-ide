@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useWorkbook } from '../../providers/WorkbookProvider'
 import { useTheme } from '../../providers/ThemeProvider'
-import * as api from '../../api/workbookApi'
+import { getNodeSchema } from '../../api/workbookApi'
 import type { SchemaField } from '../../types/workbook'
 
 interface SchemaTabProps {
@@ -9,14 +9,15 @@ interface SchemaTabProps {
 }
 
 export default function SchemaTab({ nodeId }: SchemaTabProps) {
-  const { state } = useWorkbook()
+  const { state, workbookId } = useWorkbook()
   const { colorScheme } = useTheme()
   const isDark = colorScheme === 'dark'
   const [schema, setSchema] = useState<SchemaField[] | null>(null)
 
   useEffect(() => {
-    api.getNodeSchema(nodeId).then((res) => setSchema(res.schema)).catch(() => {})
-  }, [nodeId, state.nodeResults[nodeId]])
+    if (!workbookId) return
+    getNodeSchema(workbookId, nodeId).then((res) => setSchema(res.schema)).catch(() => {})
+  }, [nodeId, workbookId, state.nodeResults[nodeId]])
 
   if (!schema) {
     return (

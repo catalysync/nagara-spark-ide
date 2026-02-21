@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react'
 import { useTheme } from '../../providers/ThemeProvider'
 import { useWorkbook } from '../../providers/WorkbookProvider'
-import * as api from '../../api/workbookApi'
+import { uploadCsv } from '../../api/datasets'
 
 interface ImportDatasetDialogProps {
   open: boolean
@@ -9,7 +9,7 @@ interface ImportDatasetDialogProps {
 }
 
 export default function ImportDatasetDialog({ open, onClose }: ImportDatasetDialogProps) {
-  const { state, dispatch, autoLayout } = useWorkbook()
+  const { state, dispatch, autoLayout, projectId } = useWorkbook()
   const { colorScheme } = useTheme()
   const isDark = colorScheme === 'dark'
   const [tab, setTab] = useState<'code' | 'csv'>('code')
@@ -42,19 +42,21 @@ export default function ImportDatasetDialog({ open, onClose }: ImportDatasetDial
   }
 
   const handleUploadCsv = async () => {
-    if (!file) return
+    if (!file || !projectId) return
     setLoading(true)
     try {
       const trimmedName = name.trim() || file.name.replace('.csv', '')
-      const result = await api.uploadCsv(file, trimmedName)
-      const id = result.node_id
+      const result = await uploadCsv(projectId, file, trimmedName)
+      const id = `dataset_${Date.now()}`
+
+      // Create a node that reads the uploaded dataset
+      const readCode = `# Auto-loaded from CSV: ${file.name}\n# Dataset saved as: ${result.name}\ndf = spark.read.parquet("${result.file_path || ''}")\ndf`
 
       dispatch({
         type: 'ADD_NODE',
         node: {
           id, type: 'dataset', name: trimmedName, language: 'python',
-          code: `# Auto-loaded from CSV: ${file.name}\n# ${result.rows} rows, ${result.columns.length} columns`,
-          save_as_dataset: true,
+          code: readCode, save_as_dataset: true,
           position: { x: 100, y: state.workbook.nodes.length * 150 },
         },
       })

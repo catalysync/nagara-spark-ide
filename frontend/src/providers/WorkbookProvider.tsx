@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useReducer, useCallback, useEffect, type ReactNode } from 'react'
 import type { Workbook, WorkbookNode, WorkbookEdge, NodeResult, ConsoleEntry } from '../types/workbook'
-import * as api from '../api/workbookApi'
+import { api } from '../api/client'
 import { getLayoutedNodes } from '../utils/autoLayout'
 
 interface WorkbookState {
@@ -162,6 +162,8 @@ interface WorkbookContextValue {
   executeConsoleCode: (code: string) => Promise<void>
   saveWorkbook: () => Promise<void>
   autoLayout: () => void
+  projectId?: string
+  workbookId?: string
 }
 
 const WorkbookContext = createContext<WorkbookContextValue | null>(null)
@@ -172,20 +174,29 @@ export function useWorkbook() {
   return ctx
 }
 
-export function WorkbookProvider({ children }: { children: ReactNode }) {
+interface WorkbookProviderProps {
+  children: ReactNode
+  projectId?: string
+  workbookId?: string
+}
+
+export function WorkbookProvider({ children, projectId, workbookId }: WorkbookProviderProps) {
   const [state, dispatch] = useReducer(reducer, initialState)
 
   // Load workbook from API on mount
   useEffect(() => {
-    api.fetchWorkbook().then((wb) => {
-      dispatch({ type: 'SET_WORKBOOK', workbook: wb })
-    }).catch(() => {})
-  }, [])
+    if (projectId && workbookId) {
+      // New DB-backed API
+      api.get<any>(`/api/projects/${projectId}/workbooks/${workbookId}`).then((wb) => {
+        dispatch({ type: 'SET_WORKBOOK', workbook: wb })
+      }).catch(() => {})
+    }
+  }, [projectId, workbookId])
 
   // Health check polling
   useEffect(() => {
     const check = () => {
-      api.checkHealth().then((h) => {
+      api.get<any>('/api/health').then((h) => {
         dispatch({ type: 'SET_SPARK_READY', ready: h.spark })
       }).catch(() => {
         dispatch({ type: 'SET_SPARK_READY', ready: false })
@@ -201,7 +212,8 @@ export function WorkbookProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'SET_NODE_RESULT', nodeId, result: { status: 'running' } })
     const start = Date.now()
     try {
-      const result = await api.executeNode(nodeId, preview)
+      const wbId = workbookId || state.workbook.id
+      const result = await api.post<any>(`/api/workbooks/${wbId}/nodes/${nodeId}/execute`, { preview })
       dispatch({
         type: 'SET_NODE_RESULT',
         nodeId,
@@ -216,7 +228,7 @@ export function WorkbookProvider({ children }: { children: ReactNode }) {
     } finally {
       dispatch({ type: 'SET_EXECUTING', nodeId, executing: false })
     }
-  }, [])
+  }, [workbookId, state.workbook.id])
 
   const executeConsoleCode = useCallback(async (code: string) => {
     const entry: ConsoleEntry = {
@@ -226,7 +238,8 @@ export function WorkbookProvider({ children }: { children: ReactNode }) {
     }
     dispatch({ type: 'ADD_CONSOLE_ENTRY', entry: { ...entry, result: { status: 'running' } } })
     try {
-      const result = await api.executeConsole(code)
+      const wbId = workbookId || state.workbook.id
+      const result = await api.post<any>(`/api/workbooks/${wbId}/console/execute`, { code })
       dispatch({
         type: 'ADD_CONSOLE_ENTRY',
         entry: { ...entry, result: result as NodeResult },
@@ -237,11 +250,18 @@ export function WorkbookProvider({ children }: { children: ReactNode }) {
         entry: { ...entry, result: { status: 'error', error: err.message } },
       })
     }
-  }, [])
+  }, [workbookId, state.workbook.id])
 
   const saveWb = useCallback(async () => {
-    await api.saveWorkbook(state.workbook)
-  }, [state.workbook])
+    if (projectId && workbookId) {
+      await api.put(`/api/projects/${projectId}/workbooks/${workbookId}`, {
+        name: state.workbook.name,
+        global_code: state.workbook.global_code,
+        nodes: state.workbook.nodes,
+        edges: state.workbook.edges,
+      })
+    }
+  }, [projectId, workbookId, state.workbook])
 
   const autoLayout = useCallback(() => {
     const layouted = getLayoutedNodes(state.workbook.nodes, state.workbook.edges)
@@ -250,18 +270,24 @@ export function WorkbookProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'UPDATE_POSITIONS', positions })
   }, [state.workbook.nodes, state.workbook.edges])
 
-  // Auto-save workbook on changes (debounced)
+  // Auto-save on changes (debounced)
   useEffect(() => {
+    if (!projectId || !workbookId) return
     const timer = setTimeout(() => {
       if (state.workbook.nodes.length > 0 || state.workbook.global_code !== initialState.workbook.global_code) {
-        api.saveWorkbook(state.workbook).catch(() => {})
+        api.put(`/api/projects/${projectId}/workbooks/${workbookId}`, {
+          name: state.workbook.name,
+          global_code: state.workbook.global_code,
+          nodes: state.workbook.nodes,
+          edges: state.workbook.edges,
+        }).catch(() => {})
       }
     }, 2000)
     return () => clearTimeout(timer)
-  }, [state.workbook])
+  }, [projectId, workbookId, state.workbook])
 
   return (
-    <WorkbookContext.Provider value={{ state, dispatch, executeNode, executeConsoleCode, saveWorkbook: saveWb, autoLayout }}>
+    <WorkbookContext.Provider value={{ state, dispatch, executeNode, executeConsoleCode, saveWorkbook: saveWb, autoLayout, projectId, workbookId }}>
       {children}
     </WorkbookContext.Provider>
   )

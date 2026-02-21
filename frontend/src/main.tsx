@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import '@shopify/polaris/build/esm/styles.css'
 import '@xyflow/react/dist/style.css'
+import './styles/global.css'
 import './styles/workbook.css'
 import App from './App'
 

@@ -1,0 +1,97 @@
+/* Nagara Spark IDE — Global Styles (Foundry-Inspired) */
+
+:root {
+  --nagara-font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Menlo, monospace;
+}
+
+/* Foundry/Blueprint Dark Theme */
+[data-theme="dark"] {
+  --bg-app: #111418;
+  --bg-surface: #1C2127;
+  --bg-surface-alt: #252A31;
+  --bg-surface-hover: #2F343C;
+  --bg-surface-active: #383E47;
+  --border-default: #383E47;
+  --border-muted: #2F343C;
+  --text-primary: #F6F7F9;
+  --text-secondary: #ABB3BF;
+  --text-muted: #738091;
+  --text-link: #4C90F0;
+  --accent: #2D72D2;
+  --green: #238551;
+  --red: #CD4246;
+  --orange: #C87619;
+  --teal: #14B8A6;
+}
+
+/* Foundry/Blueprint Light Theme */
+[data-theme="light"] {
+  --bg-app: #F6F7F9;
+  --bg-surface: #FFFFFF;
+  --bg-surface-alt: #EDEFF2;
+  --bg-surface-hover: #E5E8EB;
+  --bg-surface-active: #DCE0E5;
+  --border-default: #D3D8DE;
+  --border-muted: #E5E8EB;
+  --text-primary: #111418;
+  --text-secondary: #5F6B7C;
+  --text-muted: #8F99A8;
+  --text-link: #2D72D2;
+  --accent: #2D72D2;
+  --green: #238551;
+  --red: #CD4246;
+  --orange: #C87619;
+  --teal: #14B8A6;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #404854 transparent;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #404854;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #5F6B7C;
+}
+
+/* Focus styles */
+input:focus, select:focus, textarea:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+}
+
+button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Selection */
+::selection {
+  background: rgba(45, 114, 210, 0.3);
+}
